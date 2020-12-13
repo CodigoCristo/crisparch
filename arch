@@ -45,7 +45,7 @@ then
 	clear
 	echo "Sistema UEFI"
 	echo ""
-
+	#Fuente: https://wiki.archlinux.org/index.php/GPT_fdisk
 	#Metodo con EFI - SWAP - ROOT - HOME
 	sgdisk --zap-all ${disco}
 	parted ${disco} mklabel gpt
@@ -67,10 +67,10 @@ then
 	echo $partition | awk -F ' ' '{print $4}' >  home-efi
 
 	echo ""
-	cat boot-efi
-	cat swap-efi
-	cat root-efi
-	cat home-efi
+	echo 'Partición EFI es: ${cat boot-efi}'
+	echo 'Partición SWAP es: ${cat swap-efi}'
+	echo 'Partición ROOT es: ${cat root-efi}'
+	echo 'Partición HOME es: ${cat home-efi}'
 
 
 #---Metodo con EFI - SWAP - ROOT--------
