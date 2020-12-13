@@ -79,6 +79,25 @@ then
 	echo "Partición HOME es:"
 	cat home-efi
 
+	clear
+	echo ""
+	mkfs.ext4 $(cat root-efi) 
+	mount $(cat root-efi) /mnt 
+
+	mkdir -p /mnt/home
+	mkfs.ext4 $(cat home-efi) 
+	mount $(cat home-efi) /mnt/home
+
+	mkdir -p /mnt/efi 
+	mkfs.fat -F 32 $(cat boot-efi) 
+	mount $(cat boot-efi) /mnt/efi 
+
+	mkswap $(cat swap-efi) 
+	swapon $(cat swap-efi)
+
+	clear
+	lsblk -l
+	sleep 3
 
 #---Metodo con EFI - SWAP - ROOT--------
 #	sgdisk --zap-all ${disco}
