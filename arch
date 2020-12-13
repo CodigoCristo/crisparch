@@ -78,8 +78,11 @@ then
 	echo ""
 	echo "Partición HOME es:"
 	cat home-efi
+	sleep 3
 
 	clear
+	echo ""
+	echo "Formateando Particiones"
 	echo ""
 	mkfs.ext4 $(cat root-efi) 
 	mount $(cat root-efi) /mnt 
@@ -96,6 +99,9 @@ then
 	swapon $(cat swap-efi)
 
 	clear
+	echo ""
+	echo "Revise en punto de montaje en MOUNTPOINT"
+	echo ""
 	lsblk -l
 	sleep 3
 
