@@ -66,10 +66,10 @@ then
 	home-efi="$(echo $partitions | awk -F ' ' '{print $4}')"
 
 	echo ""
-	echo $boot-efi
-	echo $swap-efi
-	echo $root-efi
-	echo $home-efi
+	echo ${boot-efi}
+	echo ${swap-efi}
+	echo ${root-efi}
+	echo ${home-efi}
 
 
 #---Metodo con EFI - SWAP - ROOT--------
