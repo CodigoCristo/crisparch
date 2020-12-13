@@ -1,7 +1,16 @@
 #!/bin/bash
 
+sed -i '177d' /etc/locale.gen
+sed -i "177i #en_US.UTF-8 UTF-8" /etc/locale.gen
+
+sed -i '200d' /etc/locale.gen
+sed -i "200i es_ES.UTF-8 UTF-8" /etc/locale.gen
+
+locale-gen
 
 echo LANG=es_ES.UTF-8 > /etc/locale.conf
+export LANG=es_ES.UTF-8
+locale-gen
 export LANG=es_ES.UTF-8
 echo ""
 sleep 3
