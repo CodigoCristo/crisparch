@@ -49,7 +49,7 @@ then
 	#Metodo con EFI - SWAP - ROOT - HOME
 	sgdisk --zap-all ${disco}
 	parted ${disco} mklabel gpt
-	sgdisk ${disco} -n=1:0:+100M -t=1:ef00
+	sgdisk ${disco} -n=1:0:+200M -t=1:ef00
 	sgdisk ${disco} -n=2:0:+4G -t=2:8200
 	sgdisk ${disco} -n=3:0:+50G -t=3:8300
 	sgdisk ${disco} -n=4:0:0
@@ -78,7 +78,7 @@ then
 	echo ""
 	echo "Partición HOME es:"
 	cat home-efi
-	sleep 3
+	sleep 4
 
 	clear
 	echo ""
@@ -169,7 +169,7 @@ else
 	echo "Sistema BIOS"
 	echo ""
 	sgdisk --zap-all ${disco}
-	(echo o; echo n; echo p; echo 1; echo ""; echo +200M; echo n; echo p; echo 2; echo ""; echo +4G; echo n; echo p; echo 3; echo ""; echo ""; echo t; echo 2; echo 82; echo a; echo 1; echo w; echo q) | fdisk ${disco}
+	(echo o; echo n; echo p; echo 1; echo ""; echo +100M; echo n; echo p; echo 2; echo ""; echo +4G; echo n; echo p; echo 3; echo ""; echo ""; echo t; echo 2; echo 82; echo a; echo 1; echo w; echo q) | fdisk ${disco}
 	fdisk -l ${disco} > /tmp/partition 
 	cat /tmp/partition
 	sleep 3
@@ -252,7 +252,7 @@ clear
 #hosts
 clear
 #NOmbre de computador
-hostname=alv
+hostname=alvarado
 
 echo "$hostname" > /mnt/etc/hostname
 echo "127.0.1.1 $hostname.localdomain $hostname" > /mnt/etc/hosts
@@ -265,15 +265,15 @@ clear
 
 
 #USUARIO Y ADMIN
-rootpasswd=clave123
+rootpasswd=123
 user=cristo
-userpasswd=clave123
+userpasswd=123
 
 arch-chroot /mnt /bin/bash -c "(echo $rootpasswd ; echo $rootpasswd) | passwd root"
 arch-chroot /mnt /bin/bash -c "useradd -m -g users -s /bin/bash $user"
 arch-chroot /mnt /bin/bash -c "(echo $userpasswd ; echo $userpasswd) | passwd $user"
 
-sed -i "80i $user ALL=(ALL) NOPASSWD: ALL"  /mnt/etc/sudoers
+sed -i "80i $user ALL=(ALL) ALL"  /mnt/etc/sudoers
 
 
 #ACTUALIZACIÓN DE IDIOMA Y ZONA HORARIA
@@ -289,6 +289,7 @@ echo "LANG=es_PE.UTF-8" > /mnt/etc/locale.conf
 echo ""
 cat /mnt/etc/locale.conf 
 cat /mnt/etc/locale.gen
+sleep 4
 echo ""
 arch-chroot /mnt /bin/bash -c "export $(cat /mnt/etc/locale.conf)" 
 export $(cat /mnt/etc/locale.conf)
@@ -296,7 +297,7 @@ arch-chroot /mnt /bin/bash -c "sudo -u $user export $(cat /etc/locale.conf)"
 export $(cat /mnt/etc/locale.conf)
 sleep 3
 
-
+clear
 arch-chroot /mnt /bin/bash -c "pacman -Sy curl --noconfirm"
 arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime"
 
@@ -305,7 +306,12 @@ echo "KEYMAP=es" > /mnt/etc/vconsole.conf
 cat /mnt/etc/vconsole.conf 
 clear
 
-arch-chroot /mnt /bin/bash -c "hwclock -w"
+arch-chroot /mnt /bin/bash -c "timedatectl set-timezone $(curl https://ipapi.co/timezone)"
+arch-chroot /mnt /bin/bash -c "pacman -S ntp --noconfirm"
+clear
+arch-chroot /mnt /bin/bash -c "ntpd -qg"
+arch-chroot /mnt /bin/bash -c "hwclock --systohc"
+sleep 3
 
 clear
 echo ""
@@ -325,7 +331,7 @@ uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 
 if [ $uefi == 1 ]
 then
-
+clear
 arch-chroot /mnt /bin/bash -c "pacman -S grub efibootmgr os-prober dosfstools --noconfirm"
 echo '' 
 echo 'Instalando EFI System >> bootx64.efi' 
@@ -346,10 +352,10 @@ echo ''
 echo 'Lea bien que no tenga ningún error marcado' 
 echo '> Confirme tener las IMG de linux para el arranque' 
 echo '> Confirme tener la carpeta de GRUB para el arranque' 
-
+sleep 4
 
 else
-	
+clear
 arch-chroot /mnt /bin/bash -c "pacman -S grub os-prober --noconfirm"
 echo '' 
 arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $disco"
@@ -379,6 +385,9 @@ arch-chroot /mnt /bin/bash -c "pacman -S dhcpcd networkmanager iwd net-tools ifp
 #ACTIVAR SERVICIOS
 arch-chroot /mnt /bin/bash -c "systemctl enable dhcpcd NetworkManager"
 
+echo "noipv6rs" >> /mnt/etc/dhcpcd.conf
+echo "noipv6" >> /mnt/etc/dhcpcd.conf
+
 #Wifi
 #arch-chroot /mnt /bin/bash -c "pacman -S iw wireless_tools wpa_supplicant dialog wireless-regdb --noconfirm"
 
@@ -393,7 +402,10 @@ arch-chroot /mnt /bin/bash -c "pacman -S xf86-video-fbdev mesa mesa-libgl qemu-g
 
 #SHELL
 arch-chroot /mnt /bin/bash -c "pacman -S zsh zsh-completions zsh-syntax-highlighting zsh-autosuggestions --noconfirm"
-
+SH=zsh
+arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH"
+arch-chroot /mnt /bin/bash -c "chsh -s /usr/bin/$SH $user"
+arch-chroot /mnt /bin/bash -c "chsh -s /bin/$SH $user"
 
 #Xorg
 arch-chroot /mnt /bin/bash -c "pacman -S xorg xorg-apps xorg-xinit xorg-twm xterm xorg-xclock --noconfirm"
@@ -402,8 +414,10 @@ arch-chroot /mnt /bin/bash -c "pacman -S xorg xorg-apps xorg-xinit xorg-twm xter
 arch-chroot /mnt /bin/bash -c "pacman -S android-file-transfer android-tools android-udev msmtp libmtp libcddb gvfs gvfs-afc gvfs-smb gvfs-gphoto2 gvfs-mtp gvfs-goa gvfs-nfs gvfs-google dosfstools jfsutils f2fs-tools btrfs-progs exfat-utils ntfs-3g reiserfsprogs udftools xfsprogs nilfs-utils polkit gpart mtools --noconfirm"
 arch-chroot /mnt /bin/bash -c "pacman -S git wget neofetch lsb-release xdg-user-dirs --noconfirm"
 arch-chroot /mnt /bin/bash -c "xdg-user-dirs-update"
-arch-chroot /mnt /bin/bash -c "ls"
-sleep3
+clear
+echo ""
+arch-chroot /mnt /bin/bash -c "ls /home/$user"
+sleep 5
 
 
 #AUDIO
@@ -420,6 +434,7 @@ arch-chroot /mnt /bin/bash -c "pacman -S xfce4 xfce4-goodies network-manager-app
 arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings light-locker accountsservice --noconfirm"
 arch-chroot /mnt /bin/bash -c "systemctl enable lightdm"
 
+
 #establecer formato de teclado
 	  clear
             keymap="latam"
@@ -430,7 +445,7 @@ arch-chroot /mnt /bin/bash -c "systemctl enable lightdm"
       echo -e 'Section "InputClass"' > /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
       echo -e 'Identifier "system-keyboard"' >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
       echo -e 'MatchIsKeyboard "on"' >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
-      echo -e 'Option "XkbLayout" "$keymap"' >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
+      echo -e 'Option "XkbLayout" "latam"' >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
       echo -e 'EndSection' >> /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
       echo ""
       cat /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
@@ -442,8 +457,8 @@ arch-chroot /mnt /bin/bash -c "systemctl enable lightdm"
 #DESMONTAR Y REINICIAR
 umount -R /mnt
 swapoff -a
-
+	  clear
       echo ""
       echo "Visita: https://t.me/ArchLinuxCristo"
-      sleep 3
+      sleep 5
 reboot
