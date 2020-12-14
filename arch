@@ -249,33 +249,6 @@ sed -i "94i Include = /etc/pacman.d/mirrorlist" /mnt/etc/pacman.conf
 clear
 
 
-#ACTUALIZACIÓN DE IDIOMA Y ZONA HORARIA
-echo "" 
-echo -e ""
-echo -e "\t\t\t| Actualizando Idioma del Sistema |"
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
-echo -e ""
-
-echo "es_PE.UTF-8 UTF-8" > /mnt/etc/locale.gen
-arch-chroot /mnt /bin/bash -c "locale-gen" 
-echo "LANG=es_PE.UTF-8" > /mnt/etc/locale.conf
-echo ""
-cat /mnt/etc/locale.conf 
-cat /mnt/etc/locale.gen
-echo ""
-arch-chroot /mnt /bin/bash -c "export LANG=es_PE.UTF-8"
-
-
-arch-chroot /mnt /bin/bash -c "pacman -Sy curl"
-arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime"
-
-#opcional
-echo "KEYMAP=es" > /mnt/etc/vconsole.conf 
-cat /mnt/etc/vconsole.conf 
-clear
-
-arch-chroot /mnt /bin/bash -c "hwclock -w"
-
 #hosts
 clear
 #NOmbre de computador
@@ -302,6 +275,38 @@ arch-chroot /mnt /bin/bash -c "(echo $userpasswd ; echo $userpasswd) | passwd $u
 
 sed -i "80i $user ALL=(ALL) NOPASSWD: ALL"  /mnt/etc/sudoers
 
+
+#ACTUALIZACIÓN DE IDIOMA Y ZONA HORARIA
+echo "" 
+echo -e ""
+echo -e "\t\t\t| Actualizando Idioma del Sistema |"
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
+echo -e ""
+
+echo "es_PE.UTF-8 UTF-8" > /mnt/etc/locale.gen
+arch-chroot /mnt /bin/bash -c "locale-gen" 
+echo "LANG=es_PE.UTF-8" > /mnt/etc/locale.conf
+echo ""
+cat /mnt/etc/locale.conf 
+cat /mnt/etc/locale.gen
+echo ""
+arch-chroot /mnt /bin/bash -c "export $(cat /mnt/etc/locale.conf)" 
+export $(cat /mnt/etc/locale.conf)
+arch-chroot /mnt /bin/bash -c "sudo -u $user export $(cat /etc/locale.conf)"
+export $(cat /mnt/etc/locale.conf)
+sleep 3
+
+
+arch-chroot /mnt /bin/bash -c "pacman -Sy curl --noconfirm"
+arch-chroot /mnt /bin/bash -c "ln -sf /usr/share/zoneinfo/$(curl https://ipapi.co/timezone) /etc/localtime"
+
+#opcional
+echo "KEYMAP=es" > /mnt/etc/vconsole.conf 
+cat /mnt/etc/vconsole.conf 
+clear
+
+arch-chroot /mnt /bin/bash -c "hwclock -w"
+
 clear
 echo ""
 echo "Actualizando lista de MirrorList"
@@ -313,7 +318,7 @@ sleep 3
 clear
 
 #Instalación del kernel
-arch-chroot /mnt /bin/bash -c "pacman -S linux-firmware linux linux-headers mkinitcpio"
+arch-chroot /mnt /bin/bash -c "pacman -S linux-firmware linux linux-headers mkinitcpio --noconfirm"
 
 
 uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
@@ -321,7 +326,7 @@ uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 if [ $uefi == 1 ]
 then
 
-arch-chroot /mnt /bin/bash -c "pacman -S grub efibootmgr os-prober dosfstools"
+arch-chroot /mnt /bin/bash -c "pacman -S grub efibootmgr os-prober dosfstools --noconfirm"
 echo '' 
 echo 'Instalando EFI System >> bootx64.efi' 
 arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/efi --removable' 
@@ -345,7 +350,7 @@ echo '> Confirme tener la carpeta de GRUB para el arranque'
 
 else
 	
-arch-chroot /mnt /bin/bash -c "pacman -S grub os-prober"
+arch-chroot /mnt /bin/bash -c "pacman -S grub os-prober --noconfirm"
 echo '' 
 arch-chroot /mnt /bin/bash -c "grub-install --target=i386-pc $disco"
 
@@ -371,6 +376,8 @@ fi
 
 #Instalación de programas:
 arch-chroot /mnt /bin/bash -c "pacman -S dhcpcd networkmanager iwd net-tools ifplugd --noconfirm"
+#ACTIVAR SERVICIOS
+arch-chroot /mnt /bin/bash -c "systemctl enable dhcpcd NetworkManager"
 
 #Wifi
 #arch-chroot /mnt /bin/bash -c "pacman -S iw wireless_tools wpa_supplicant dialog wireless-regdb --noconfirm"
@@ -411,7 +418,7 @@ arch-chroot /mnt /bin/bash -c "pacman -S xfce4 xfce4-goodies network-manager-app
 
 #DISPLAY MANAGER
 arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings light-locker accountsservice --noconfirm"
-
+arch-chroot /mnt /bin/bash -c "systemctl enable lightdm"
 
 #establecer formato de teclado
 	  clear
@@ -429,6 +436,7 @@ arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk
       cat /mnt/etc/X11/xorg.conf.d/00-keyboard.conf
       sleep 5
       clear
+
 
 
 #DESMONTAR Y REINICIAR
