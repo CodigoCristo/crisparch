@@ -202,8 +202,8 @@ else
 
 	echo $partition | awk -F ' ' '{print $1}' >  boot-bios
 	echo $partition | awk -F ' ' '{print $2}' >  swap-bios
-	echo $partition | awk -F ' ' '{print $3}' >  home-bios
 	echo $partition | awk -F ' ' '{print $3}' >  root-bios
+	echo $partition | awk -F ' ' '{print $4}' >  home-bios
 
 	echo ""
 	echo "Partición BOOT es:" 
