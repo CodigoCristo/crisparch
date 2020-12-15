@@ -29,14 +29,31 @@ sleep 3
 clear
 
 #Disco
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo "print devices" | parted | grep /dev/ | awk '{if (NR!=1) {print}}'
 echo ''
 read -p "Introduce tu disco a instalar Arch: " disco
-
+echo ""
+read -p "Introduce la clave de Administrador: " rootpasswd
+echo ""
+read -p "Introduce Nombre usuario Nuevo: " user
+echo ""
+read -p "Introduce la clave de $user: " userpasswd
+echo ""
+read -p "Introduce tu ubicación (Eg.es_PE.UTF-8 / es_MX.UTF-8 / es_CO.UTF-8): " userpais
+echo ""
 echo ''
 echo "Selección de Disco: $disco"
-sleep 3
 echo ''
+echo "USUARIO: $user"
+echo ''
+echo "CLAVE DE USUARIO: $userpasswd"
+echo ''
+echo "CLAVE DE ADMINISTRADOR: $rootpasswd"
+sleep 4
+echo ''
+
+
 
 uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 
@@ -252,8 +269,7 @@ clear
 #hosts
 clear
 #NOmbre de computador
-hostname=alvarado
-
+hostname=ArcriS
 echo "$hostname" > /mnt/etc/hostname
 echo "127.0.1.1 $hostname.localdomain $hostname" > /mnt/etc/hosts
 clear
@@ -265,9 +281,6 @@ clear
 
 
 #USUARIO Y ADMIN
-rootpasswd=123
-user=cristo
-userpasswd=123
 
 arch-chroot /mnt /bin/bash -c "(echo $rootpasswd ; echo $rootpasswd) | passwd root"
 arch-chroot /mnt /bin/bash -c "useradd -m -g users -s /bin/bash $user"
@@ -283,9 +296,9 @@ echo -e "\t\t\t| Actualizando Idioma del Sistema |"
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo -e ""
 
-echo "es_PE.UTF-8 UTF-8" > /mnt/etc/locale.gen
+echo "$userpais UTF-8" > /mnt/etc/locale.gen
 arch-chroot /mnt /bin/bash -c "locale-gen" 
-echo "LANG=es_PE.UTF-8" > /mnt/etc/locale.conf
+echo "LANG=$userpais" > /mnt/etc/locale.conf
 echo ""
 cat /mnt/etc/locale.conf 
 cat /mnt/etc/locale.gen
