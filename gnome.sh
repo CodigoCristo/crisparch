@@ -186,6 +186,7 @@ else
 
 	echo $partition | awk -F ' ' '{print $1}' >  boot-bios
 	echo $partition | awk -F ' ' '{print $2}' >  swap-bios
+	echo $partition | awk -F ' ' '{print $3}' >  home-bios
 	echo $partition | awk -F ' ' '{print $3}' >  root-bios
 
 	echo ""
@@ -194,6 +195,9 @@ else
 	echo ""
 	echo "Partición SWAP es:"
 	cat swap-bios
+	echo ""
+	echo "Partición HOME es:"
+	cat home-bios
 	echo ""
 	echo "Partición ROOT es:"
 	cat root-bios
@@ -209,6 +213,10 @@ else
 	mkdir -p /mnt/boot
 	mkfs.ext4 $(cat boot-bios) 
 	mount $(cat boot-bios) /mnt/boot
+
+	mkdir -p /mnt/home
+	mkfs.ext4 $(cat home-bios) 
+	mount $(cat home-bios) /mnt/home
 
 	mkswap $(cat swap-bios) 
 	swapon $(cat swap-bios)
