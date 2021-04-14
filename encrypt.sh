@@ -16,34 +16,29 @@
 	echo $partition | awk -F ' ' '{print $2}' >  swap-efi
 	echo $partition | awk -F ' ' '{print $3}' >  root-efi
 
-	echo ""
-	echo "Partición EFI es:" 
-	cat boot-efi
-	echo ""
-	echo "Partición SWAP es:"
-	cat swap-efi
-	echo ""
-	echo "Partición ROOT es:"
-	cat root-efi
-	sleep 3
 
-	clear
-	echo ""
-	echo "Formateando Particiones"
-	echo ""
-	mkfs.ext4 $(cat root-efi) 
-	mount $(cat root-efi) /mnt 
+clear
+printf "Clave de cifrado: "
+read PASSPHRASE
+echo "$PASSPHRASE"
+sleep 5
 
-	mkdir -p /mnt/efi 
-	mkfs.fat -F 32 $(cat boot-efi) 
-	mount $(cat boot-efi) /mnt/efi 
+echo -n "$PASSPHRASE" | cryptsetup --verbose -c aes-xts-plain64 --pbkdf argon2id --type luks2 -y luksFormat "$(cat root-efi)"
+echo -n "$PASSPHRASE" | cryptsetup luksOpen "$(cat root-efi)" linux-cifrado
 
-	mkswap $(cat swap-efi) 
-	swapon $(cat swap-efi)
+mkfs.ext4 /dev/mapper/linux-cifrado
+mount /dev/mapper/linux-cifrado /mnt 
 
-	clear
-	echo ""
-	echo "Revise en punto de montaje en MOUNTPOINT"
-	echo ""
-	lsblk -l
-	sleep 3
+mkdir -p /mnt/efi 
+mkfs.fat -F 32 $(cat boot-efi) 
+mount $(cat boot-efi) /mnt/efi 
+
+mkswap $(cat swap-efi) 
+swapon $(cat swap-efi)
+
+clear
+echo ""
+echo "Revise en punto de montaje en MOUNTPOINT"
+echo ""
+lsblk -l
+sleep 3
