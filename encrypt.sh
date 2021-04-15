@@ -41,4 +41,48 @@ echo ""
 echo "Revise en punto de montaje en MOUNTPOINT"
 echo ""
 lsblk -l
-sleep 3
+
+echo "Presiona ENTER para continuar..."
+sleep 5
+
+pacman -Sy reflector python --noconfirm
+
+reflector --verbose --latest 5 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+
+pacstrap /mnt base base-devel lvm2 wget efibootmgr grub nano reflector python neofetch
+
+genfstab -p /mnt > /mnt/etc/fstab
+
+
+arch-chroot /mnt /bin/bash -c "pacman -S dhcpcd networkmanager iwd net-tools ifplugd --noconfirm"
+#ACTIVAR SERVICIOS
+arch-chroot /mnt /bin/bash -c "systemctl enable dhcpcd NetworkManager"
+
+echo "noipv6rs" >> /mnt/etc/dhcpcd.conf
+echo "noipv6" >> /mnt/etc/dhcpcd.conf
+
+arch-chroot /mnt /bin/bash -c "pacman -S linux linux-headers linux-firmware mkinitcpio --noconfirm"
+
+
+sed -i '7d' /mnt/etc/mkinitcpio.conf
+sed -i '7i MODULES=(ext4)' /mnt/etc/mkinitcpio.conf
+
+sed -i 's/HOOKS=(base udev autodetect modconf block filesystems keyboard fsck)/HOOKS=(base udev autodetect modconf block encrypt filesystems keyboard fsck)/g' /mnt/etc/mkinitcpio.conf
+arch-chroot /mnt /bin/bash -c 'mkinitcpio -P'
+
+partition_root=$(cat root-efi)
+
+sed -i '6d' /mnt/etc/default/grub
+sed -i '6i GRUB_CMDLINE_LINUX="${partition_root}:linux-cifrado"' /mnt/etc/default/grub
+
+echo '' 
+echo 'Instalando EFI System >> bootx64.efi' 
+arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/efi --removable' 
+echo '' 
+echo 'Instalando UEFI System >> grubx64.efi' 
+arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=Arch'
+
+arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
+
+
+reboot
