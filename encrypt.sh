@@ -73,7 +73,7 @@ arch-chroot /mnt /bin/bash -c 'mkinitcpio -P'
 partition_root=$(cat root-efi)
 
 sed -i '6d' /mnt/etc/default/grub
-sed -i '6i GRUB_CMDLINE_LINUX="${partition_root}:linux-cifrado"' /mnt/etc/default/grub
+sed -i '6i GRUB_CMDLINE_LINUX="cryptdevice=${partition_root}:linux-cifrado"' /mnt/etc/default/grub
 
 echo '' 
 echo 'Instalando EFI System >> bootx64.efi' 
