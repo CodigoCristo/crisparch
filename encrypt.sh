@@ -24,14 +24,18 @@ echo "$PASSPHRASE"
 sleep 5
 
 echo -n "$PASSPHRASE" | cryptsetup --verbose -c aes-xts-plain64 --pbkdf argon2id --type luks2 -y luksFormat "$(cat root-efi)"
-echo -n "$PASSPHRASE" | cryptsetup luksOpen "$(cat root-efi)" linux-cifrado
+echo -n "$PASSPHRASE" | cryptsetup luksOpen "$(cat root-efi)" arch-cifrado
 
-mkfs.ext4 /dev/mapper/linux-cifrado
-mount /dev/mapper/linux-cifrado /mnt 
+(echo -n "123") |
 
-mkdir -p /mnt/efi 
+
+
+mkfs.ext4 /dev/mapper/arch-cifrado
+mount /dev/mapper/arch-cifrado /mnt 
+
+mkdir -p /mnt/boot
 mkfs.fat -F 32 $(cat boot-efi) 
-mount $(cat boot-efi) /mnt/efi 
+mount $(cat boot-efi) /mnt/boot 
 
 mkswap $(cat swap-efi) 
 swapon $(cat swap-efi)
@@ -72,15 +76,18 @@ arch-chroot /mnt /bin/bash -c 'mkinitcpio -P'
 
 partition_root=$(cat root-efi)
 
-sed -i '6d' /mnt/etc/default/grub
-sed -i '6i GRUB_CMDLINE_LINUX="cryptdevice=${partition_root}:linux-cifrado"' /mnt/etc/default/grub
+# sed -i '6d' /mnt/etc/default/grub
+# echo "GRUB_CMDLINE_LINUX=cryptdevice=${partition_root}:linux-cifrado" >> /mnt/etc/default/grub
+
+sed -i /GRUB_CMDLINE_LINUX=/c\GRUB_CMDLINE_LINUX=\"cryptdevice=$(cat root-efi):arch-cifrado\" /mnt/etc/default/grub
+
 
 echo '' 
 echo 'Instalando EFI System >> bootx64.efi' 
-arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/efi --removable' 
+arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/boot --removable' 
 echo '' 
 echo 'Instalando UEFI System >> grubx64.efi' 
-arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=Arch'
+arch-chroot /mnt /bin/bash -c 'grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=Arch'
 
 arch-chroot /mnt /bin/bash -c "grub-mkconfig -o /boot/grub/grub.cfg"
 
