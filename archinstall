@@ -20,9 +20,9 @@ echo ""
 echo "$idioma UTF-8" > /etc/locale.gen
 locale-gen
 echo "LANG=$idioma" > /etc/locale.conf
-#exportlang=$(echo "LANG=$idioma")
-#export $exportlang
-#export LANG=$idioma
+exportlang=$(echo "LANG=$idioma")
+export $exportlang
+export LANG=$idioma
 export $(cat /etc/locale.conf)
 locale-gen
 echo ""
@@ -160,6 +160,8 @@ then
 	echo $partition | awk -F ' ' '{print $3}' >  root-efi
 	echo $partition | awk -F ' ' '{print $4}' >  home-efi
 
+	clear
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
 	echo "Partición EFI es:" 
 	cat boot-efi
@@ -219,6 +221,8 @@ then
 #	echo $partition | awk -F ' ' '{print $2}' >  swap-efi
 #	echo $partition | awk -F ' ' '{print $3}' >  root-efi
 #
+#	clear
+#	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 #	echo ""
 #	echo "Partición EFI es:" 
 #	cat boot-efi
@@ -286,6 +290,8 @@ else
 	echo $partition | awk -F ' ' '{print $3}' >  root-bios
 	echo $partition | awk -F ' ' '{print $4}' >  home-bios
 
+	clear
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
 	echo "Partición BOOT es:" 
 	cat boot-bios
@@ -342,6 +348,8 @@ else
 #	echo $partition | awk -F ' ' '{print $2}' >  swap-bios
 #	echo $partition | awk -F ' ' '{print $3}' >  root-bios
 #
+#	clear
+#	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 #	echo ""
 #	echo "Partición BOOT es:" 
 #	cat boot-bios
