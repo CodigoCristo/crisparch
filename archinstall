@@ -57,8 +57,7 @@ echo ""
 # Escritorios
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo ""
-echo "Ingresa una opción marcando el numero correcto:"
-echo "(1 - 2 - 3 - 4)"
+echo "Ingresa una opción marcando el numero correcto: (1 - 2 - 3 - 4)"
 echo ""
 echo "1. Terminal Virtual (TTY)"
 echo "2. Xfce4"
@@ -70,6 +69,7 @@ echo ""
 
 # Mostrar datos guardados
 clear
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo ''
 echo "Selección de Disco: $disco"
 echo ''
@@ -101,10 +101,12 @@ case $escritorio in
     echo "¡Incorrecto! por defecto se instalará Terminal Virtual (TTY)"
   ;;
 esac
-
+echo ""
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
+echo ""
 echo ""
 echo "Para confirmar e instalar Arch Linux"
 echo ""
 echo "Presione ENTER o para salir presione CTRL + C"
 read line
-echo ''
+
