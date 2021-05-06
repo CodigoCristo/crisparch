@@ -20,7 +20,9 @@ echo ""
 echo "$idioma UTF-8" > /etc/locale.gen
 locale-gen
 echo "LANG=$idioma" > /etc/locale.conf
-export LANG=$idioma
+exportlang=$(echo "LANG=$idioma")
+export $exportlang
+locale-gen
 echo ""
 clear
 
@@ -54,7 +56,10 @@ echo ""
 
 # Escritorios
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
-echo "Ingresa una opción marcando el numero correcto: (1 - 2 - 3 - 4)"
+echo ""
+echo "Ingresa una opción marcando el numero correcto:"
+echo "(1 - 2 - 3 - 4)"
+echo ""
 echo "1. Terminal Virtual (TTY)"
 echo "2. Xfce4"
 echo "3. Kde Plasma"
@@ -74,6 +79,32 @@ echo "Clave de usuario: $userpasswd"
 echo ''
 echo "Clave de Administrador: $rootpasswd"
 echo ''
-echo "escritorio: $rootpasswd"
-sleep 4
+
+# Vemos que opción elige el usuario y realiza tal acción en este caso mostrar mensaje
+case $escritorio in
+  1)
+    echo "Escritorio : Terminal Virtual (TTY)"
+  ;;
+
+  2)
+    echo "Escritorio : Xfce4"
+  ;;
+
+  3)
+    echo "Escritorio : Kde Plasma"
+  ;;
+
+  4)
+    echo "Escritorio : Gnome 40"
+  ;;
+  *)
+    echo "¡Incorrecto! por defecto se instalará Terminal Virtual (TTY)"
+  ;;
+esac
+
+echo ""
+echo "Para confirmar e instalar Arch Linux"
+echo ""
+echo "Presione ENTER o para salir presione CTRL + C"
+read line
 echo ''
