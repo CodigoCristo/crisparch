@@ -20,9 +20,9 @@ echo ""
 echo "$idioma UTF-8" > /etc/locale.gen
 locale-gen
 echo "LANG=$idioma" > /etc/locale.conf
-exportlang=$(echo "LANG=$idioma")
-export $exportlang
-export LANG=$idioma
+#exportlang=$(echo "LANG=$idioma")
+#export $exportlang
+#export LANG=$idioma
 export $(cat /etc/locale.conf)
 locale-gen
 echo ""
@@ -49,11 +49,11 @@ printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo ""
 read -p "Introduce tu disco a instalar Arch: " disco
 echo ""
-read -p "Introduce la clave de Administrador: " rootpasswd
-echo ""
 read -p "Introduce Nombre usuario Nuevo: " user
 echo ""
 read -p "Introduce la clave de $user: " userpasswd
+echo ""
+read -p "Introduce la clave de Root/Administrador: " rootpasswd
 echo ""
 
 # Escritorios
@@ -121,8 +121,11 @@ uefi=$( ls /sys/firmware/efi/ | grep -ic efivars )
 if [ $uefi == 1 ]
 then
 	clear
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
+	echo ""
 	echo "Tu Sistema es UEFI"
 	echo ""
+	date "+%F %H:%M"
 	sleep 3
 	#Fuente: https://wiki.archlinux.org/index.php/GPT_fdisk
 
@@ -142,7 +145,7 @@ then
 	parted ${disco} mklabel gpt
 	sgdisk ${disco} -n=1:0:+100M -t=1:ef00
 	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
-	sgdisk ${disco} -n=3:0:+50G -t=3:8300
+	sgdisk ${disco} -n=3:0:+25G -t=3:8300
 	sgdisk ${disco} -n=4:0:0
 	fdisk -l ${disco} > /tmp/partition
 	echo ""
@@ -251,15 +254,17 @@ then
 
 else
 	clear
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 	echo ""
 	echo "Tu Sistema es BIOS"
 	echo ""
+	date "+%F %H:%M"
 	sleep 3
 	#---Metodo con BIOS - SWAP - ROOT- HOME-------
 	#+100M 			particion boot
-	#+4G			particion swap
+	#+${swapsize}G	particion swap
 	#+${swapsize}G	particion root
-	#""				partición home
+	#+20G			partición home
 	#				Cambien valores si desean
 
 	# Esta variable pone la misma cantidad de Gib que tenemos en ram fisica
