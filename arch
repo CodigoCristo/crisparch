@@ -1,37 +1,40 @@
 #!/bin/bash
+#Creador Código Cristo
+#https://www.patreon.com/codigocristo
 
 #Sistema en español en liveCD
+
+# El resultado de Curl aqui es: es-PE,qu,ay
+# curl https://ipapi.co/languages  
+
+# El resultado de Curl aqui es: es_PE.UTF8 UTF-8
+# curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8 UTF-8|"
+
+# Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
+
+idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
 clear
 echo ""
 echo "Sistema en español"
 echo ""
-echo "es_ES.UTF-8 UTF-8" > /etc/locale.gen
+echo "$idioma UTF-8" > /etc/locale.gen
 locale-gen
-echo "LANG=es_ES.UTF-8" > /etc/locale.conf
-export LANG=es_ES.UTF-8
+echo "LANG=$idioma" > /etc/locale.conf
+export LANG=$idioma
 echo ""
 sleep 3
 
-#Actualización de llaves y mirroslist
-clear
-pacman -Sy archlinux-keyring --noconfirm 
-clear
-pacman -Sy reflector python rsync --noconfirm 
-sleep 3
-clear
-echo ""
-echo "Actualizando lista de MirrorList"
-echo ""
-reflector --verbose --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
-clear
-cat /etc/pacman.d/mirrorlist
-sleep 3
-clear
+
 
 #Disco
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
-echo "print devices" | parted | grep /dev/ | awk '{if (NR!=1) {print}}'
-echo ''
+echo "Rutas de Disco disponible: "
+echo ""
+echo "print devices" | parted | grep /dev/ | awk '{if (NR!=1) {print}}' | sed '/sr/d')
+echo ""
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
+
+# Ingresar Datos de usuario
 read -p "Introduce tu disco a instalar Arch: " disco
 echo ""
 read -p "Introduce la clave de Administrador: " rootpasswd
@@ -40,16 +43,30 @@ read -p "Introduce Nombre usuario Nuevo: " user
 echo ""
 read -p "Introduce la clave de $user: " userpasswd
 echo ""
-read -p "Introduce tu ubicación (Eg.es_PE.UTF-8 / es_MX.UTF-8 / es_CO.UTF-8): " userpais
+
+# Escritorios
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
+echo "Ingresa una opción marcando el numero correcto: (1 - 2 - 3 - 4)"
+echo "1. Terminal Virtual (TTY)"
+echo "2. Xfce4"
+echo "3. Kde Plasma"
+echo "4. Gnome 40"
 echo ""
+read -p "Introduce la opción de Escritorio: " escritorio
+echo ""
+
+# Mostrar datos guardados
+clear
 echo ''
 echo "Selección de Disco: $disco"
 echo ''
-echo "USUARIO: $user"
+echo "Tu usuario: $user"
 echo ''
-echo "CLAVE DE USUARIO: $userpasswd"
+echo "Clave de usuario: $userpasswd"
 echo ''
-echo "CLAVE DE ADMINISTRADOR: $rootpasswd"
+echo "Clave de Administrador: $rootpasswd"
+echo ''
+echo "escritorio: $rootpasswd"
 sleep 4
 echo ''
 
@@ -300,6 +317,22 @@ else
 fi
 
 
+#Actualización de llaves y mirroslist
+clear
+pacman -Syy
+pacman -Sy archlinux-keyring --noconfirm 
+clear
+pacman -Sy reflector python rsync --noconfirm 
+sleep 3
+clear
+echo ""
+echo "Actualizando lista de MirrorList"
+echo ""
+reflector --verbose --latest 5 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+clear
+cat /etc/pacman.d/mirrorlist
+sleep 3
+clear
 
 
 echo ""

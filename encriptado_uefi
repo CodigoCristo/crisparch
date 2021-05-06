@@ -13,6 +13,23 @@ echo ""
 sleep 3
 
 
+#Actualización de llaves y mirroslist
+clear
+pacman -Syy
+pacman -Sy archlinux-keyring --noconfirm 
+clear
+pacman -Sy reflector python rsync --noconfirm 
+sleep 3
+clear
+echo ""
+echo "Actualizando lista de MirrorList"
+echo ""
+reflector --verbose --latest 5 --protocol http --protocol https --sort rate --save /etc/pacman.d/mirrorlist
+clear
+cat /etc/pacman.d/mirrorlist
+sleep 3
+clear
+
 
 disco="/dev/vda"
 dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress

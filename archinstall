@@ -1,0 +1,71 @@
+#!/bin/bash
+#Creador Código Cristo
+#https://www.patreon.com/codigocristo
+
+#Sistema en español en liveCD
+
+# El resultado de Curl aqui es: es-PE,qu,ay
+# curl https://ipapi.co/languages  
+
+# El resultado de Curl aqui es: es_PE.UTF8 UTF-8
+# curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8 UTF-8|"
+
+# Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
+
+idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
+clear
+echo ""
+echo "Sistema en español"
+echo ""
+echo "$idioma UTF-8" > /etc/locale.gen
+locale-gen
+echo "LANG=$idioma" > /etc/locale.conf
+export LANG=$idioma
+echo ""
+clear
+
+
+
+#Disco
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
+echo "Rutas de Disco disponible: "
+echo ""
+echo "print devices" | parted | grep /dev/ | awk '{if (NR!=1) {print}}' | sed '/sr/d')
+echo ""
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
+
+# Ingresar Datos de usuario
+read -p "Introduce tu disco a instalar Arch: " disco
+echo ""
+read -p "Introduce la clave de Administrador: " rootpasswd
+echo ""
+read -p "Introduce Nombre usuario Nuevo: " user
+echo ""
+read -p "Introduce la clave de $user: " userpasswd
+echo ""
+
+# Escritorios
+printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
+echo "Ingresa una opción marcando el numero correcto: (1 - 2 - 3 - 4)"
+echo "1. Terminal Virtual (TTY)"
+echo "2. Xfce4"
+echo "3. Kde Plasma"
+echo "4. Gnome 40"
+echo ""
+read -p "Introduce la opción de Escritorio: " escritorio
+echo ""
+
+# Mostrar datos guardados
+clear
+echo ''
+echo "Selección de Disco: $disco"
+echo ''
+echo "Tu usuario: $user"
+echo ''
+echo "Clave de usuario: $userpasswd"
+echo ''
+echo "Clave de Administrador: $rootpasswd"
+echo ''
+echo "escritorio: $rootpasswd"
+sleep 4
+echo ''
