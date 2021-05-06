@@ -11,7 +11,7 @@
 # curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8 UTF-8|"
 
 # Lo cual vamos a guardar como variable para usarlo más adelante y en automatico
-
+clear
 idioma=$(curl https://ipapi.co/languages | awk -F "," '{print $1}' | sed 's/-/_/g' | sed "s|$|.UTF8|")
 clear
 echo ""
@@ -27,11 +27,12 @@ clear
 
 
 #Disco
+discosdisponibles=$(echo "print devices" | parted | grep /dev/ | awk '{if (NR!=1) {print}}' | sed '/sr/d')
+clear
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
 echo ""
 echo "Rutas de Disco disponible: "
 echo ""
-discosdisponibles=$(echo "print devices" | parted | grep /dev/ | awk '{if (NR!=1) {print}}' | sed '/sr/d')
 echo $discosdisponibles
 echo ""
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' _
