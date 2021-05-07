@@ -519,10 +519,10 @@ case $escritorio in
 	arch-chroot /mnt /bin/bash -c "pacman -S xorg xorg-apps xorg-xinit xorg-twm xterm xorg-xclock --noconfirm"
 
     # Programas de Xfce4
-    arch-chroot /mnt /bin/bash -c "pacman -S xfce4 xfce4-goodies network-manager-applet ffmpegthumbs ffmpegthumbnailer"
+    arch-chroot /mnt /bin/bash -c "pacman -S xfce4 xfce4-goodies network-manager-applet ffmpegthumbs ffmpegthumbnailer --noconfirm"
 	
 	# Programas para Login
-	arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings light-locker accountsservice"
+	arch-chroot /mnt /bin/bash -c "pacman -S lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings light-locker accountsservice --noconfirm"
 	arch-chroot /mnt /bin/bash -c "systemctl enable lightdm"
 
 	# Establecer formato de teclado dentro de Xorg
@@ -569,7 +569,7 @@ case $escritorio in
 	arch-chroot /mnt /bin/bash -c "pacman -S xorg xorg-apps xorg-xinit xorg-twm xterm xorg-xclock --noconfirm"
 
     # Programas para KDE Plasma minimalista
-    arch-chroot /mnt /bin/bash -c "pacman -S plasma dolphin konsole discover sddm ffmpegthumbs ffmpegthumbnailer"
+    arch-chroot /mnt /bin/bash -c "pacman -S plasma dolphin konsole discover sddm ffmpegthumbs ffmpegthumbnailer --noconfirm"
     arch-chroot /mnt /bin/bash -c "systemctl enable sddm"
 
     # Establecer formato de teclado dentro de Xorg
@@ -616,7 +616,7 @@ case $escritorio in
 	arch-chroot /mnt /bin/bash -c "pacman -S xorg xorg-apps xorg-xinit xorg-twm xterm xorg-xclock --noconfirm"
 
     # Programas para Gnome minimalista
-    arch-chroot /mnt /bin/bash -c "pacman -S gnome-shell gdm gnome-control-center gnome-tweaks gnome-terminal nautilus"
+    arch-chroot /mnt /bin/bash -c "pacman -S gnome-shell gdm gnome-control-center gnome-tweaks gnome-terminal nautilus --noconfirm"
     arch-chroot /mnt /bin/bash -c "systemctl enable gdm"
 
     # Establecer formato de teclado dentro de Xorg
@@ -694,7 +694,7 @@ reboot
 #
 	#+100M 			tamaño particion boot
 	#+${swapsize}G  tamaño particion swap
-	#+50G			tamaño particion root
+	#+20G			tamaño particion root
 	#0				tamaño partición home
 	#				Cambien valores si desean
 #
@@ -704,7 +704,7 @@ reboot
 #	parted ${disco} mklabel gpt
 #	sgdisk ${disco} -n=1:0:+100M -t=1:ef00
 #	sgdisk ${disco} -n=2:0:+${swapsize}G -t=2:8200
-#	sgdisk ${disco} -n=3:0:+25G -t=3:8300
+#	sgdisk ${disco} -n=3:0:+20G -t=3:8300
 #	sgdisk ${disco} -n=4:0:0
 #	fdisk -l ${disco} > /tmp/partition
 #	echo ""
