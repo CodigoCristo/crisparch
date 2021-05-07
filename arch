@@ -358,13 +358,9 @@ clear
 sed -i 's/#Color/Color/g' /mnt/etc/pacman.conf
 sed -i 's/#TotalDownload/TotalDownload/g' /mnt/etc/pacman.conf
 sed -i 's/#VerbosePkgLists/VerbosePkgLists/g' /mnt/etc/pacman.conf
-
 sed -i "37i ILoveCandy" /mnt/etc/pacman.conf
-
-sed -i '93d' /mnt/etc/pacman.conf
-sed -i '94d' /mnt/etc/pacman.conf
-sed -i "93i [multilib]" /mnt/etc/pacman.conf
-sed -i "94i Include = /etc/pacman.d/mirrorlist" /mnt/etc/pacman.conf
+sed -i 's/#[multilib]/[multilib]/g' /mnt/etc/pacman.conf
+sed -i "s/#Include = /etc/pacman.d/mirrorlist/Include = /etc/pacman.d/mirrorlist/g" /mnt/etc/pacman.conf
 clear
 
 
