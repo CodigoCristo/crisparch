@@ -140,8 +140,8 @@ then
 	# free --giga | awk '/^Mem:/{print $2}'
 
 	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-	dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
-	#(echo Ignore) | sgdisk --zap-all ${disco}
+	#dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
+	(echo Ignore) | sgdisk --zap-all ${disco}
 	#parted ${disco} mklabel gpt
 	(echo 2; echo w; echo Y) | gdisk ${disco}
 	sgdisk ${disco} -n=1:0:+100M -t=1:ef00
