@@ -140,7 +140,7 @@ then
 	# free --giga | awk '/^Mem:/{print $2}'
 
 	swapsize=$(free --giga | awk '/^Mem:/{print $2}')
-	#dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
+	dd if=/dev/zero of="${disco}" bs=100M count=10 status=progress
 	sgdisk --zap-all ${disco}
 	parted ${disco} mklabel gpt
 	sgdisk ${disco} -n=1:0:+100M -t=1:ef00
@@ -184,12 +184,16 @@ then
 	mkswap $(cat swap-efi) 
 	swapon $(cat swap-efi)
 
+	rm boot-efi
+	rm swap-efi
+	rm root-efi
+
 	clear
 	echo ""
-	echo "Revise en punto de montaje en MOUNTPOINT"
+	echo "Revise en punto de montaje en MOUNTPOINT - PRESIONE ENTER"
 	echo ""
 	lsblk -l
-	sleep 3
+	read line
 
 
 else
